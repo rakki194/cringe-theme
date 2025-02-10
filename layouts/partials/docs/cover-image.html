@@ -1,0 +1,23 @@
+{{ with .Params.image }}
+<div class="book-cover-image">
+    {{ if $.Params.blurhash }}
+    <canvas 
+        class="blur-hash" 
+        data-blurhash="{{ $.Params.blurhash }}" 
+        width="1200" 
+        height="400"
+        style="width: 1200px; height: 400px;"
+    ></canvas>
+    {{ end }}
+    <img 
+        src="{{ . }}" 
+        alt="{{ $.Params.image_alt | default "Cover image" }}" 
+        loading="lazy"
+        width="1200"
+        height="400"
+        {{ if $.Params.blurhash }}
+        onload="this.previousElementSibling.style.display = 'none'; this.style.opacity = 1;"
+        {{ end }}
+    />
+</div>
+{{ end }} 

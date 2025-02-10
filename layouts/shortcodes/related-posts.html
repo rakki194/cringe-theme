@@ -1,0 +1,121 @@
+{{ $related := .Get "related" }}
+{{ $currentLang := .Page.Language.Lang }}
+
+<script>
+function logFailedPath(path, normalizedPath) {
+    console.log('Failed to find related page:', {
+        original: path,
+        normalized: normalizedPath
+    });
+}
+</script>
+
+<div class="related-posts">
+    <h3>{{ T "relatedPosts" }}</h3>
+    <div class="related-posts-grid">
+        {{ range split $related "|" }}
+            {{ $path := trim . " " }}
+            {{ if not (hasPrefix $path "/") }}
+                {{ $path = printf "/%s" $path }}
+            {{ end }}
+            
+            {{ $page := false }}
+            {{ $normalizedPath := replace $path " " "-" }}
+            
+            {{ if hasPrefix $path (printf "/%s/" $currentLang) }}
+                {{ $page = site.GetPage $path }}
+                {{ if not $page }}
+                    {{ $page = site.GetPage $normalizedPath }}
+                {{ end }}
+            {{ else if hasPrefix $path "/en/" }}
+                {{ $localPath := replace $path "/en/" (printf "/%s/" $currentLang) }}
+                {{ $normalizedLocalPath := replace $localPath " " "-" }}
+                {{ $page = site.GetPage $localPath }}
+                {{ if not $page }}
+                    {{ $page = site.GetPage $normalizedLocalPath }}
+                {{ end }}
+                {{ if not $page }}
+                    {{ $page = site.GetPage $path }}
+                {{ end }}
+                {{ if not $page }}
+                    {{ $page = site.GetPage $normalizedPath }}
+                {{ end }}
+            {{ else }}
+                {{ $langPath := printf "/%s%s" $currentLang $path }}
+                {{ $normalizedLangPath := replace $langPath " " "-" }}
+                {{ $page = site.GetPage $langPath }}
+                {{ if not $page }}
+                    {{ $page = site.GetPage $normalizedLangPath }}
+                {{ end }}
+                {{ if not $page }}
+                    {{ $page = site.GetPage $path }}
+                {{ end }}
+                {{ if not $page }}
+                    {{ $page = site.GetPage $normalizedPath }}
+                {{ end }}
+            {{ end }}
+            
+            {{ if $page }}
+            <a href="{{ $page.RelPermalink }}" class="related-post-card">
+                <h4>{{ $page.Title }}</h4>
+                <p>{{ $page.Params.summary }}</p>
+            </a>
+            {{ else }}
+            <script>
+                logFailedPath({{ $path | jsonify | safeJS }}, {{ $normalizedPath | jsonify | safeJS }});
+            </script>
+            {{ end }}
+        {{ end }}
+    </div>
+</div>
+
+<style>
+.related-posts {
+    margin: 2rem 0;
+    padding: 1rem;
+    background: var(--gray-100);
+    border-radius: 8px;
+}
+
+.related-posts h3 {
+    margin-bottom: 1rem;
+    color: var(--body-font-color);
+}
+
+.related-posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.related-post-card {
+    padding: 1rem;
+    background: var(--body-background);
+    border-radius: 6px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.related-post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.related-post-card h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--body-font-color);
+}
+
+.related-post-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--body-font-color);
+    opacity: 0.85;
+    line-height: 1.4;
+    flex-grow: 1;
+}
+</style>

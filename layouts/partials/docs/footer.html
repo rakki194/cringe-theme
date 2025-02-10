@@ -1,0 +1,54 @@
+{{ $lang := .Site.Language.Lang }}
+<div class="book-footer-quote" id="footerQuote" style="display: none; opacity: 0; transition: opacity 0.3s ease-out;">
+  <button id="closeFooter" aria-label="Close footer" style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer; color: inherit; font-size: 1.5em; padding: 5px; line-height: 1; opacity: 0.7; transition: opacity 0.2s;">&times;</button>
+  {{ if eq $lang "en" }}
+    <p>Yiff Toolkit is your creative lens, magnifying your intentions into reality. Like the winds shaping sand into dunes, it's a force guided by your actions. Every pixel, line, and idea it brings to life carries your signature—ensure it's one you stand behind.</p>
+  {{ else if eq $lang "ja" }}
+    <p>イフツールキットは、あなたの創造力のレンズであり、あなたの意図を現実へと拡大します。砂丘を形作る風のように、それはあなたの行動によって導かれる力です。それが生み出すすべてのピクセル、線、そしてアイデアには、あなたの署名が刻まれています。それがあなたが誇れるものであることを確かめてください。</p>
+  {{ else if eq $lang "hu" }}
+    <p>A Yiff Toolkit a kreativitásod lencséje, amely felnagyítja szándékaidat a valóságba. Akár a homokot formáló szél, ez is egy erő, amelyet tetteid irányítanak. Minden pixel, vonal és ötlet, amit létrehoz, a te aláírásodat viseli. Győződj meg róla, hogy olyan dolgot alkotsz, amire büszke lehetsz.</p>
+  {{ end }}
+</div>
+
+{{ $script := resources.Get "clipboard.js" | resources.Minify }}
+{{ with $script.Content }}
+  <script>{{ . | safeJS }}</script>
+{{ end }}
+
+<script>
+(function() {
+  // Wait for DOM to be ready
+  document.addEventListener('DOMContentLoaded', function() {
+    const footerQuote = document.getElementById('footerQuote');
+    const closeButton = document.getElementById('closeFooter');
+    
+    // Check if footer should be shown
+    if (localStorage.getItem('footerClosed') !== 'true') {
+      footerQuote.style.display = 'block';
+      // Small delay to ensure the transition works
+      setTimeout(() => {
+        footerQuote.style.opacity = '1';
+      }, 10);
+    }
+
+    // Add hover effect for close button
+    closeButton.addEventListener('mouseover', function() {
+      this.style.opacity = '1';
+    });
+    closeButton.addEventListener('mouseout', function() {
+      this.style.opacity = '0.7';
+    });
+
+    // Handle close button click
+    closeButton.addEventListener('click', function() {
+      footerQuote.style.opacity = '0';
+      
+      // After animation, hide the element
+      setTimeout(function() {
+        footerQuote.style.display = 'none';
+        localStorage.setItem('footerClosed', 'true');
+      }, 300);
+    });
+  });
+})();
+</script>

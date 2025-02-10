@@ -1,0 +1,122 @@
+@import "defaults";
+@import "themes/{{ default "light" .Site.Params.BookTheme }}";
+
+@import "normalize";
+@import "utils";
+@import "main";
+@import "fonts";
+@import "print";
+@import "images";
+@import "markdown";
+@import "shortcodes";
+@import "video";
+@import "selection";
+@import "breadcrumb";
+
+.markdown {
+  hr {
+    background: #AAA;
+    border: none;
+  }
+
+  code {
+    font-size: 0.8em;
+  }
+}
+
+.book-cover-image {
+  position: relative;
+  width: calc(100% + 1rem);
+  height: 400px;
+  overflow: hidden;
+  
+  canvas.blur-hash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+  }
+  
+  img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    
+    &:only-child {
+      opacity: 1;
+    }
+  }
+}
+
+.book-menu {
+  .book-menu-content {
+    &::-webkit-scrollbar {
+      width: 0.75rem;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--gray-500);
+      border-radius: 0.375rem;
+    }
+  }
+}
+
+.toast {
+  position: fixed;
+  bottom: 1rem;
+  right: 0;
+  transform: translateX(-50%);
+  background: var(--body-background);
+  color: var(--body-font-color);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1000;
+  border: 1px solid var(--gray-200);
+}
+
+.toast.show {
+  opacity: 1;
+}
+
+.book-footer-quote {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  text-align: center;
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  z-index: 100;
+  margin-left: var(--menu-width);
+  margin-right: var(--toc-width);
+  background-color: var(--body-font-color);
+  color: var(--body-background);
+
+  @media screen and (max-width: $mobile-breakpoint) {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  p {
+    margin: 0;
+    max-width: 80ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+// Add padding to main content to prevent footer overlap
+.book-page {
+  padding-bottom: 8rem;
+}

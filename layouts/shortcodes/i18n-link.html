@@ -1,0 +1,44 @@
+{{- /* Get the target path */ -}}
+{{- $path := .Get 0 -}}
+{{- $text := .Get 1 | default $path -}}
+{{- $href_only := .Get 2 | default false -}}
+
+{{- /* Get current page language */ -}}
+{{- $lang := .Page.Language.Lang -}}
+
+{{- /* If it's not English and the path starts with /docs, try to find translated version */ -}}
+{{- if and (ne $lang "en") (hasPrefix $path "/docs") -}}
+    {{- $translatedPath := printf "/%s%s" $lang $path -}}
+    {{- /* Look for the page in all site pages */ -}}
+    {{- $found := false -}}
+    {{- range .Site.Pages -}}
+        {{- if eq .RelPermalink (printf "%s/" $translatedPath) -}}
+            {{- $found = true -}}
+        {{- end -}}
+    {{- end -}}
+    {{- if not $href_only -}}
+        <!-- DEBUG: Current language: {{ $lang }} -->
+        <!-- DEBUG: Original path: {{ $path }} -->
+        <!-- DEBUG: Translated path: {{ $translatedPath }} -->
+        <!-- DEBUG: Page exists: {{ $found }} -->
+    {{- end -}}
+    {{- if $found -}}
+        {{- if $href_only -}}
+            {{- printf "%s/" $translatedPath -}}
+        {{- else -}}
+            <a href="{{ printf "%s/" $translatedPath }}">{{ $text }}</a>
+        {{- end -}}
+    {{- else -}}
+        {{- if $href_only -}}
+            {{- printf "%s/" $path -}}
+        {{- else -}}
+            <a href="{{ printf "%s/" $path }}">{{ $text }}</a>
+        {{- end -}}
+    {{- end -}}
+{{- else -}}
+    {{- if $href_only -}}
+        {{- printf "%s/" $path -}}
+    {{- else -}}
+        <a href="{{ printf "%s/" $path }}">{{ $text }}</a>
+    {{- end -}}
+{{- end -}} 

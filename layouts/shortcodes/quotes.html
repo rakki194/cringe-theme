@@ -1,0 +1,20 @@
+{{ $lang := .Site.Language.Lang }}
+{{ $quotesPath := printf "/js/quotes.%s.js" $lang }}
+{{ if not (fileExists (printf "static%s" $quotesPath)) }}
+  {{ $quotesPath = "/js/quotes.en.js" }}
+{{ end }}
+
+<div id="quote-container"></div>
+<script src="{{ $quotesPath }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof quotesJson !== 'undefined') {
+      const randomIndex = Math.floor(Math.random() * quotesJson.length);
+      const quote = quotesJson[randomIndex];
+      const container = document.getElementById('quote-container');
+      if (container) {
+        container.innerHTML = `<blockquote><p>${quote.quote}</p><footer>— ${quote.author}</footer></blockquote>`;
+      }
+    }
+  });
+</script> 

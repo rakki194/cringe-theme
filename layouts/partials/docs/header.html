@@ -1,0 +1,8 @@
+{{- if default true .Site.Params.BookMenuBundle }}
+<div class="book-header-title">
+  <label for="menu-control">
+    <i class="ms-Icon ms-Icon--GlobalNavButton" aria-hidden="true"></i>
+  </label>
+  <strong>{{ partial "docs/title" . }}</strong>
+</div>
+{{- end -}}

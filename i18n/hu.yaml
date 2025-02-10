@@ -1,0 +1,18 @@
+# Translations for Hungarian
+- id: Search
+  translation: "Keresés"
+
+- id: Edit this page
+  translation: "Oldal szerkesztése"
+
+- id: Last modified by
+  translation: "Utoljára módosította"
+
+- id: Expand
+  translation: "Kibontás"
+
+- id: bookSearchConfig
+  translation: '{ cache: true }'
+
+- id: relatedPosts
+  translation: "Kapcsolódó Bejegyzések" 

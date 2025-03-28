@@ -1,0 +1,39 @@
+{{ $currentPage := . }}
+{{ if and (not .IsHome) (not (eq .RelPermalink (print "/" .Site.Language.Lang "/"))) }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ "/" | absLangURL }}"
+    }
+    {{ $position := 2 }}
+    {{ $ancestors := slice $currentPage }}
+    {{ $parent := $currentPage.Parent }}
+    {{ while $parent }}
+      {{ if and (not $parent.IsHome) (not (eq $parent.RelPermalink (print "/" $parent.Site.Language.Lang "/"))) }}
+        {{ $ancestors = $ancestors | append $parent }}
+      {{ end }}
+      {{ $parent = $parent.Parent }}
+    {{ end }}
+    
+    {{ $ancestors = $ancestors | reverse }}
+    {{ range $index, $ancestor := $ancestors }}
+      {{ if and (not $ancestor.IsHome) (not (eq $ancestor.RelPermalink (print "/" $ancestor.Site.Language.Lang "/"))) }}
+        ,{
+          "@type": "ListItem",
+          "position": {{ $position }},
+          "name": "{{ partial "docs/title" $ancestor }}",
+          "item": "{{ $ancestor.Permalink }}"
+        }
+        {{ $position = add $position 1 }}
+      {{ end }}
+    {{ end }}
+  ]
+}
+</script>
+{{ end }} 

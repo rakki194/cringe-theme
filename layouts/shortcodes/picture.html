@@ -1,0 +1,35 @@
+{{ $src := .Get "src" }}
+{{ $alt := .Get "alt" | default "" }}
+{{ $width := .Get "width" }}
+{{ $height := .Get "height" }}
+{{ $loading := .Get "loading" | default "lazy" }}
+{{ $class := .Get "class" | default "" }}
+{{ $fetchpriority := .Get "fetchpriority" | default "auto" }}
+
+<picture class="responsive-picture {{ $class }}">
+  {{ $srcWebp := replace $src (path.Ext $src) ".webp" }}
+  {{ $srcAvif := replace $src (path.Ext $src) ".avif" }}
+  
+  <source 
+    srcset="{{ $srcAvif }}" 
+    type="image/avif"
+    width="{{ $width }}"
+    height="{{ $height }}"
+  >
+  <source 
+    srcset="{{ $srcWebp }}" 
+    type="image/webp"
+    width="{{ $width }}"
+    height="{{ $height }}"
+  >
+  <img 
+    src="{{ $src }}" 
+    alt="{{ $alt }}" 
+    width="{{ $width }}" 
+    height="{{ $height }}" 
+    loading="{{ $loading }}"
+    fetchpriority="{{ $fetchpriority }}"
+    decoding="async"
+    style="max-width: 100%; height: auto;"
+  >
+</picture> 

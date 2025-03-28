@@ -1,0 +1,17 @@
+{{ if .Params.image }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ImageObject",
+  "contentUrl": "{{ .Params.image }}",
+  "name": "{{ .Title }}",
+  "description": "{{ with .Params.image_alt }}{{ . }}{{ else }}Image for {{ .Title }}{{ end }}",
+  "width": "{{ with .Params.image_width }}{{ . }}{{ else }}1200{{ end }}",
+  "height": "{{ with .Params.image_height }}{{ . }}{{ else }}800{{ end }}",
+  "uploadDate": "{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}",
+  "license": "{{ with .Params.image_license }}{{ . }}{{ else }}https://creativecommons.org/licenses/by/4.0/{{ end }}",
+  "acquireLicensePage": "{{ with .Params.image_license_url }}{{ . }}{{ else }}https://creativecommons.org/licenses/by/4.0/{{ end }}",
+  "creditText": "{{ with .Params.image_credit }}{{ . }}{{ else }}{{ .Site.Title }}{{ end }}"
+}
+</script>
+{{ end }} 

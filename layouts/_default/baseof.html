@@ -3,6 +3,7 @@
 <head>
   {{ partial "docs/html-head" . }}
   {{ partial "docs/inject/head" . }}
+  {{ block "schema" . }}{{ end }}
   {{ if .Param "math" }}
     {{ partialCached "math.html" . }}
   {{ end }}

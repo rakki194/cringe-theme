@@ -1,0 +1,11 @@
+{{ if .Params.faq }}
+  {{ partial "docs/faq-schema" . }}
+{{ else if .Params.tutorial }}
+  {{ partial "docs/howto-schema" . }}
+{{ else }}
+  {{ partial "docs/article-schema" . }}
+{{ end }}
+
+{{ if .Params.image }}
+  {{ partial "docs/image-schema" . }}
+{{ end }} 

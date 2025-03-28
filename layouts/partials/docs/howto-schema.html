@@ -1,0 +1,53 @@
+{{ if .Params.tutorial }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "{{ .Title }}",
+  "description": "{{ if .Description }}{{ .Description }}{{ else }}{{ .Summary }}{{ end }}",
+  "image": "{{ with .Params.image }}{{ . }}{{ else }}{{ .Site.BaseURL }}{{ default "logo.png" (index .Site.Params.Images 0) }}{{ end }}",
+  "totalTime": "{{ with .Params.tutorialTime }}{{ . }}{{ else }}PT30M{{ end }}",
+  "estimatedCost": {
+    "@type": "MonetaryAmount",
+    "currency": "USD",
+    "value": "{{ with .Params.tutorialCost }}{{ . }}{{ else }}0{{ end }}"
+  },
+  "tool": [
+    {{ range $index, $tool := .Params.tutorialTools }}
+    {{ if $index }},{{ end }}
+    {
+      "@type": "HowToTool",
+      "name": "{{ $tool }}"
+    }
+    {{ else }}
+    {
+      "@type": "HowToTool",
+      "name": "ComfyUI"
+    }
+    {{ end }}
+  ],
+  "supply": [
+    {{ range $index, $supply := .Params.tutorialSupplies }}
+    {{ if $index }},{{ end }}
+    {
+      "@type": "HowToSupply",
+      "name": "{{ $supply }}"
+    }
+    {{ end }}
+  ],
+  "step": [
+    {{ $headers := findRE "<h[2-3].*?>(.|\n)*?</h[2-3]>" .Content }}
+    {{ $headerCount := len $headers }}
+    {{ range $index, $header := $headers }}
+    {{ if $index }},{{ end }}
+    {
+      "@type": "HowToStep",
+      "name": "{{ $header | replaceRE "<h[2-3].*?>(.|\n)*?</h[2-3]>" "$1" | plainify }}",
+      "text": "{{ $header | replaceRE "<h[2-3].*?>(.|\n)*?</h[2-3]>" "$1" | plainify }}",
+      "url": "{{ $.Permalink }}#{{ $header | replaceRE "<h[2-3] id=\"(.*)\".*?>(.|\n)*?</h[2-3]>" "$1" }}"
+    }
+    {{ end }}
+  ]
+}
+</script>
+{{ end }} 

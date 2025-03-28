@@ -82,6 +82,8 @@
 }
 </script>
 
+{{ partial "docs/breadcrumb-schema" . }}
+
 {{- $manifest := resources.Get "manifest.webmanifest" | resources.ExecuteAsTemplate "manifest.webmanifest" . }}
 <link rel="manifest" href="{{ $manifest.RelPermalink }}" type="application/manifest+json">
 <link rel="canonical" href="{{ .Permalink }}">

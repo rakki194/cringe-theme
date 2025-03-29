@@ -14,11 +14,20 @@
     {{ $position := 2 }}
     {{ $ancestors := slice $currentPage }}
     {{ $parent := $currentPage.Parent }}
-    {{ while $parent }}
-      {{ if and (not $parent.IsHome) (not (eq $parent.RelPermalink (print "/" $parent.Site.Language.Lang "/"))) }}
-        {{ $ancestors = $ancestors | append $parent }}
+    {{ $collectAncestors := "" }}
+    {{ if $parent }}
+      {{ $ancestors = slice }}
+      {{ $p := $parent }}
+      {{ range seq 1 100 }}
+        {{ if $p }}
+          {{ if and (not $p.IsHome) (not (eq $p.RelPermalink (print "/" $p.Site.Language.Lang "/"))) }}
+            {{ $ancestors = $ancestors | append $p }}
+          {{ end }}
+          {{ $p = $p.Parent }}
+        {{ else }}
+          {{ break }}
+        {{ end }}
       {{ end }}
-      {{ $parent = $parent.Parent }}
     {{ end }}
     
     {{ $ancestors = $ancestors | reverse }}

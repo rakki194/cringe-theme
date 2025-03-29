@@ -30,8 +30,17 @@
       {{ end }}
     {{ end }}
     
-    {{ $ancestors = $ancestors | reverse }}
-    {{ range $index, $ancestor := $ancestors }}
+    {{ $reversedAncestors := slice }}
+    {{ $length := len $ancestors }}
+    {{ range seq 0 (sub $length 1) }}
+      {{ $i := sub $length 1 }}
+      {{ $i = sub $i . }}
+      {{ if ge $i 0 }}
+        {{ $reversedAncestors = $reversedAncestors | append (index $ancestors $i) }}
+      {{ end }}
+    {{ end }}
+    
+    {{ range $index, $ancestor := $reversedAncestors }}
       {{ if and (not $ancestor.IsHome) (not (eq $ancestor.RelPermalink (print "/" $ancestor.Site.Language.Lang "/"))) }}
         ,{
           "@type": "ListItem",

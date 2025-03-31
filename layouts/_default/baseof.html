@@ -5,7 +5,7 @@
   {{ partial "docs/inject/head" . }}
   {{ block "schema" . }}{{ end }}
   {{ if .Param "math" }}
-    {{ partialCached "math.html" . }}
+    {{ partial "math.html" . }}
   {{ end }}
 </head>
 <body dir="{{ default "ltr" .Site.Language.LanguageDirection }}">

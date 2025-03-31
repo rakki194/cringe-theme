@@ -41,7 +41,7 @@
     {{ end }}
     
     {{ range $index, $ancestor := $reversedAncestors }}
-      {{ if and (not $ancestor.IsHome) (not (eq $ancestor.RelPermalink (print "/" $ancestor.Site.Language.Lang "/"))) }}
+      {{ if and $ancestor (not (or (eq $ancestor nil) (and (ne $ancestor.IsHome nil) ($ancestor.IsHome)) (eq $ancestor.RelPermalink (print "/" $ancestor.Site.Language.Lang "/")))) }}
         ,{
           "@type": "ListItem",
           "position": {{ $position }},

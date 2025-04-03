@@ -76,4 +76,74 @@ html.theme-light #theme-toggle:hover {
 
 html.theme-dark #theme-toggle:hover {
   background-color: var(--gray-500);
+}
+
+/* Auto theme styles that follow system preference */
+html.theme-auto {
+  @media (prefers-color-scheme: light) {
+    --gray-100: #f8f9fa !important;
+    --gray-200: #e9ecef !important;
+    --gray-500: #adb5bd !important;
+    --color-link: #1e66f5 !important;
+    --color-visited-link: #8839ef !important;
+    --body-background: #eff1f5 !important;
+    --body-font-color: #4c4f69 !important;
+    --icon-filter: none !important;
+    --hint-color-info: #1e66f5 !important;
+    --hint-color-warning: #dc8a78 !important;
+    --hint-color-danger: #d20f39 !important;
+    
+    background-color: #eff1f5 !important;
+    color: #4c4f69 !important;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    --gray-100: #313244 !important;
+    --gray-200: #45475a !important;
+    --gray-500: #6c7086 !important;
+    --color-link: #89b4fa !important;
+    --color-visited-link: #cba6f7 !important;
+    --body-background: #1e1e2e !important;
+    --body-font-color: #cdd6f4 !important;
+    --icon-filter: brightness(0) invert(1) !important;
+    --hint-color-info: #89b4fa !important;
+    --hint-color-warning: #fab387 !important;
+    --hint-color-danger: #f38ba8 !important;
+    
+    background-color: #1e1e2e !important;
+    color: #cdd6f4 !important;
+  }
+}
+
+/* Auto theme specific elements */
+html.theme-auto body {
+  @media (prefers-color-scheme: light) {
+    background-color: #eff1f5 !important;
+    color: #4c4f69 !important;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    background-color: #1e1e2e !important;
+    color: #cdd6f4 !important;
+  }
+}
+
+html.theme-auto .highlight {
+  @media (prefers-color-scheme: light) {
+    background-color: var(--body-background) !important;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    background-color: var(--body-background) !important;
+  }
+}
+
+html.theme-auto pre {
+  @media (prefers-color-scheme: light) {
+    background-color: var(--gray-100) !important;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    background-color: var(--gray-100) !important;
+  }
 } 

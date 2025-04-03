@@ -21,28 +21,35 @@
           } else if (savedTheme === 'theme-dark') {
             document.documentElement.style.backgroundColor = '#1e1e2e';
             document.documentElement.style.color = '#cdd6f4';
+          } else if (savedTheme === 'theme-auto') {
+            // Auto theme - use system preference for initial visual
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (prefersDark) {
+              document.documentElement.style.backgroundColor = '#1e1e2e';
+              document.documentElement.style.color = '#cdd6f4';
+            } else {
+              document.documentElement.style.backgroundColor = '#eff1f5';
+              document.documentElement.style.color = '#4c4f69';
+            }
           }
         } else {
+          // No saved preference - use auto theme which follows system preference
           var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var newTheme = prefersDark ? 'theme-dark' : 'theme-light';
           
           // Remove any existing theme classes first
           document.documentElement.classList.remove('theme-light', 'theme-dark', 'theme-auto');
-          // Set the theme based on system preference
-          document.documentElement.classList.add(newTheme);
+          // Set auto theme
+          document.documentElement.classList.add('theme-auto');
           // Ensure the class is set completely
-          document.documentElement.className = newTheme;
+          document.documentElement.className = 'theme-auto';
           
-          // Store the preference
-          localStorage.setItem('theme-preference', newTheme);
-          
-          // Apply direct style as fallback in case CSS variables aren't processed yet
-          if (newTheme === 'theme-light') {
-            document.documentElement.style.backgroundColor = '#eff1f5';
-            document.documentElement.style.color = '#4c4f69';
-          } else if (newTheme === 'theme-dark') {
+          // Apply direct style based on system preference
+          if (prefersDark) {
             document.documentElement.style.backgroundColor = '#1e1e2e';
             document.documentElement.style.color = '#cdd6f4';
+          } else {
+            document.documentElement.style.backgroundColor = '#eff1f5';
+            document.documentElement.style.color = '#4c4f69';
           }
         }
       } catch (e) {

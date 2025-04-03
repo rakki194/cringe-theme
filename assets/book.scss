@@ -1,6 +1,5 @@
 @import "defaults";
 
-// Remove the auto theme import and handle directly
 // Define basic light theme for initial render
 :root {
   @include theme-light;
@@ -32,6 +31,29 @@ html.theme-dark {
   * {
     --body-background: #1e1e2e;
     --body-font-color: #cdd6f4;
+  }
+}
+
+// User explicitly chose auto theme - follow system preference
+html.theme-auto {
+  // Light mode styles when system preference is light
+  @media (prefers-color-scheme: light) {
+    @include theme-light;
+    
+    * {
+      --body-background: #eff1f5;
+      --body-font-color: #4c4f69;
+    }
+  }
+  
+  // Dark mode styles when system preference is dark
+  @media (prefers-color-scheme: dark) {
+    @include theme-dark;
+    
+    * {
+      --body-background: #1e1e2e;
+      --body-font-color: #cdd6f4;
+    }
   }
 }
 

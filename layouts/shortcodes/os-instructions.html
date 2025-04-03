@@ -1,18 +1,18 @@
 {{ $id := (.Get 0) }}
 <div class="os-instructions">
     <div class="os-tabs">
-        <button class="os-tab windows active" onclick="selectOS('windows', '{{ $id }}')">Windows</button>
-        <button class="os-tab linux" onclick="selectOS('linux', '{{ $id }}')">Linux</button>
-        <button class="os-tab mac" onclick="selectOS('mac', '{{ $id }}')">macOS</button>
+        <button class="os-tab windows os-btn os-btn-windows active" data-os="windows">Windows</button>
+        <button class="os-tab linux os-btn os-btn-linux" data-os="linux">Linux</button>
+        <button class="os-tab mac os-btn os-btn-mac" data-os="mac">macOS</button>
     </div>
     <div class="os-content">
-        <div class="os-section windows active" id="windows-{{ $id }}">
+        <div class="os-section os-windows active" id="windows-{{ $id }}">
             {{ .Inner | replaceRE "<!-- linux -->[\\s\\S]*?<!-- mac -->" "" | replaceRE "<!-- mac -->[\\s\\S]*?" "" }}
         </div>
-        <div class="os-section linux" id="linux-{{ $id }}">
+        <div class="os-section os-linux" id="linux-{{ $id }}">
             {{ .Inner | replaceRE "(?s).*?<!-- linux -->(.*?)<!-- mac -->.*" "$1" | safeHTML }}
         </div>
-        <div class="os-section mac" id="mac-{{ $id }}">
+        <div class="os-section os-mac" id="mac-{{ $id }}">
             {{ .Inner | replaceRE "(?s).*?<!-- mac -->(.*)" "$1" | safeHTML }}
         </div>
     </div>
@@ -32,10 +32,11 @@ function selectOS(os, id) {
             selectedSection.classList.add('active');
         } else {
             console.warn(`Section with ID ${os}-${id} not found`);
+            return; // Exit early if section not found
         }
         
-        // Find the parent container of the clicked button
-        const container = document.querySelector(`.os-section[id$="-${id}"]`)?.closest('.os-instructions');
+        // Find the parent container
+        const container = selectedSection.closest('.os-instructions');
         if (!container) {
             console.warn(`Container for ${id} not found`);
             return;
@@ -58,21 +59,40 @@ function selectOS(os, id) {
     }
 }
 
-// Set the initial OS based on stored preference or default to windows
-document.addEventListener('DOMContentLoaded', function() {
-    try {
-        const preferredOS = localStorage.getItem('preferredOS') || 'windows';
-        document.querySelectorAll('.os-instructions').forEach(container => {
-            const section = container.querySelector('.os-section');
-            if (section) {
-                const id = section.id.split('-').pop();
-                selectOS(preferredOS, id);
-            }
-        });
-    } catch (error) {
-        console.error(`Error in OS initialization: ${error.message}`);
-    }
-});
+// Make the initialization function run only once
+if (!window.osInstructionsInitialized) {
+    window.osInstructionsInitialized = true;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            // Add click handlers to all OS tabs
+            document.querySelectorAll('.os-tab').forEach(button => {
+                button.addEventListener('click', function() {
+                    const os = this.getAttribute('data-os');
+                    const container = this.closest('.os-instructions');
+                    const section = container.querySelector(`.os-section.os-${os}`);
+                    if (section) {
+                        const id = section.id.split('-').pop();
+                        selectOS(os, id);
+                    }
+                });
+            });
+            
+            // Set initial OS based on preference
+            const preferredOS = localStorage.getItem('preferredOS') || 'windows';
+            document.querySelectorAll('.os-instructions').forEach(container => {
+                const sections = container.querySelectorAll('.os-section');
+                if (sections.length > 0) {
+                    // Get id from first section
+                    const id = sections[0].id.split('-').pop();
+                    selectOS(preferredOS, id);
+                }
+            });
+        } catch (error) {
+            console.error(`Error in OS initialization: ${error.message}`);
+        }
+    });
+}
 </script>
 
 <style>

@@ -160,12 +160,14 @@ if (typeof window.osInstructionsInitialized === 'undefined') {
     border-radius: 4px;
     overflow: hidden;
     border: 1px solid var(--gray-200);
+    transition: border-color 0.3s ease;
 }
 
 .os-tabs {
     display: flex;
     background-color: var(--gray-100);
     border-bottom: 1px solid var(--gray-200);
+    transition: background-color 0.3s ease;
 }
 
 .os-tab {
@@ -175,6 +177,8 @@ if (typeof window.osInstructionsInitialized === 'undefined') {
     cursor: pointer;
     font-weight: 500;
     color: var(--gray-600);
+    position: relative;
+    transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 .os-tab:hover {
@@ -184,20 +188,50 @@ if (typeof window.osInstructionsInitialized === 'undefined') {
 .os-tab.active {
     background-color: white;
     color: var(--primary-color);
-    border-bottom: 2px solid var(--primary-color);
+    border-bottom: none;
+    position: relative;
+}
+
+.os-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    transition: background-color 0.3s ease;
+}
+
+/* OS-specific active tab styling */
+.os-tab.windows.active::after {
+    background-color: #0078d7; /* Windows blue */
+}
+
+.os-tab.linux.active::after {
+    background-color: #ff6b6b; /* Linux red */
+}
+
+.os-tab.mac.active::after {
+    background-color: #777bd9; /* macOS purplish blue */
 }
 
 .os-content {
     padding: 1rem;
     background-color: white;
+    transition: background-color 0.3s ease;
 }
 
 .os-section {
     display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .os-section.active {
     display: block;
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* Fix for nested markdown content */
@@ -237,7 +271,20 @@ if (typeof window.osInstructionsInitialized === 'undefined') {
     .os-tab.active {
         background-color: var(--gray-900);
         color: var(--primary-color-light);
-        border-bottom: 2px solid var(--primary-color-light);
+        border-bottom: none;
+    }
+    
+    /* OS-specific active tab styling for dark mode */
+    .os-tab.windows.active::after {
+        background-color: #4cc2ff; /* Brighter Windows blue for dark mode */
+    }
+
+    .os-tab.linux.active::after {
+        background-color: #ff8080; /* Brighter Linux red for dark mode */
+    }
+
+    .os-tab.mac.active::after {
+        background-color: #9c9eff; /* Brighter macOS purplish blue for dark mode */
     }
     
     .os-content {

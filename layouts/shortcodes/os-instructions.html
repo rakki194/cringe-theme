@@ -1,1 +1,125 @@
- 
+{{ $id := (.Get 0) }}
+<div class="os-instructions">
+    <div class="os-tabs">
+        <button class="os-tab windows active" onclick="selectOS('windows', '{{ $id }}')">Windows</button>
+        <button class="os-tab linux" onclick="selectOS('linux', '{{ $id }}')">Linux</button>
+        <button class="os-tab mac" onclick="selectOS('mac', '{{ $id }}')">macOS</button>
+    </div>
+    <div class="os-content">
+        <div class="os-section windows active" id="windows-{{ $id }}">
+            {{ .Inner | replaceRE "<!-- linux -->[\\s\\S]*?<!-- mac -->" "" | replaceRE "<!-- mac -->[\\s\\S]*?" "" }}
+        </div>
+        <div class="os-section linux" id="linux-{{ $id }}">
+            {{ .Inner | replaceRE "(?s).*?<!-- linux -->(.*?)<!-- mac -->.*" "$1" | safeHTML }}
+        </div>
+        <div class="os-section mac" id="mac-{{ $id }}">
+            {{ .Inner | replaceRE "(?s).*?<!-- mac -->(.*)" "$1" | safeHTML }}
+        </div>
+    </div>
+</div>
+
+<script>
+function selectOS(os, id) {
+    // Hide all OS sections
+    document.querySelectorAll(`.os-section[id$="-${id}"]`).forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Show the selected OS section
+    document.getElementById(`${os}-${id}`).classList.add('active');
+    
+    // Update tab classes
+    document.querySelectorAll(`.os-tab`).forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Update the active tab
+    document.querySelectorAll(`.os-tab.${os}`).forEach(tab => {
+        tab.classList.add('active');
+    });
+    
+    // Store the selection in localStorage
+    localStorage.setItem('preferredOS', os);
+}
+
+// Set the initial OS based on stored preference or default to windows
+document.addEventListener('DOMContentLoaded', function() {
+    const preferredOS = localStorage.getItem('preferredOS') || 'windows';
+    document.querySelectorAll('.os-instructions').forEach(container => {
+        const id = container.querySelector('.os-section').id.split('-').pop();
+        selectOS(preferredOS, id);
+    });
+});
+</script>
+
+<style>
+.os-instructions {
+    margin: 1.5rem 0;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+}
+
+.os-tabs {
+    display: flex;
+    background-color: var(--gray-100);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.os-tab {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--gray-600);
+}
+
+.os-tab:hover {
+    background-color: var(--gray-200);
+}
+
+.os-tab.active {
+    background-color: white;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.os-content {
+    padding: 1rem;
+    background-color: white;
+}
+
+.os-section {
+    display: none;
+}
+
+.os-section.active {
+    display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+    .os-tabs {
+        background-color: var(--gray-800);
+        border-bottom: 1px solid var(--gray-700);
+    }
+    
+    .os-tab {
+        color: var(--gray-400);
+    }
+    
+    .os-tab:hover {
+        background-color: var(--gray-700);
+    }
+    
+    .os-tab.active {
+        background-color: var(--gray-900);
+        color: var(--primary-color-light);
+        border-bottom: 2px solid var(--primary-color-light);
+    }
+    
+    .os-content {
+        background-color: var(--gray-900);
+    }
+}
+</style> 

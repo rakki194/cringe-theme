@@ -1,5 +1,17 @@
 @import "defaults";
-@import "themes/{{ default "light" .Site.Params.BookTheme }}";
+
+// Import auto theme which applies system preference by default
+@import "themes/auto";
+
+// These styles are properly applied when theme class is set via JavaScript
+html.theme-light {
+  @import "themes/light";
+}
+
+html.theme-dark {
+  @import "themes/dark";
+}
+
 @import "theme-override";
 
 @import "normalize";

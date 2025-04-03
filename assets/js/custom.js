@@ -44,22 +44,37 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Apply saved theme or detect from system
     const savedTheme = localStorage.getItem('theme-preference');
+    
+    // First, ensure HTML doesn't have the auto class that might interfere
+    document.documentElement.classList.remove('theme-auto');
+    
     if (savedTheme) {
-      document.documentElement.className = savedTheme;
+      // Explicitly set the theme class
+      document.documentElement.classList.remove('theme-light', 'theme-dark');
+      document.documentElement.classList.add(savedTheme);
+      document.documentElement.className = savedTheme; // Ensure className is fully replaced
       updateThemeToggleIcon(savedTheme);
     } else {
       // No saved preference, use system preference
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.className = prefersDark ? 'theme-dark' : 'theme-light';
-      updateThemeToggleIcon(prefersDark ? 'theme-dark' : 'theme-light');
+      const newTheme = prefersDark ? 'theme-dark' : 'theme-light';
+      document.documentElement.classList.remove('theme-light', 'theme-dark');
+      document.documentElement.classList.add(newTheme);
+      document.documentElement.className = newTheme; // Ensure className is fully replaced
+      updateThemeToggleIcon(newTheme);
+      
+      // Save the initial system preference
+      localStorage.setItem('theme-preference', newTheme);
     }
     
     // Add click event
     themeToggle.addEventListener('click', function() {
       const currentTheme = document.documentElement.className;
-      const newTheme = currentTheme === 'theme-dark' ? 'theme-light' : 'theme-dark';
+      const newTheme = currentTheme.includes('theme-dark') ? 'theme-light' : 'theme-dark';
       
-      // Update class on root html element
+      // Update class on root html element - both ways to ensure it works
+      document.documentElement.classList.remove('theme-light', 'theme-dark');
+      document.documentElement.classList.add(newTheme);
       document.documentElement.className = newTheme;
       
       // Save preference
@@ -67,10 +82,15 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Update icon
       updateThemeToggleIcon(newTheme);
+      
+      // Force update syntax highlighting
+      if (typeof updateSyntaxCSS === 'function') {
+        updateSyntaxCSS();
+      }
     });
     
     function updateThemeToggleIcon(theme) {
-      if (theme === 'theme-dark') {
+      if (theme.includes('theme-dark')) {
         themeToggle.innerHTML = '<i class="ms-Icon ms-Icon--Sunny" aria-hidden="true"></i>';
         themeToggle.style.color = 'var(--color-link)';
       } else {
@@ -82,4 +102,30 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize theme toggle
   initThemeToggle();
+  
+  // Add event listener for system theme changes
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+    // Only apply if no saved preference exists
+    if (!localStorage.getItem('theme-preference')) {
+      const newTheme = e.matches ? 'theme-dark' : 'theme-light';
+      document.documentElement.classList.remove('theme-light', 'theme-dark');
+      document.documentElement.classList.add(newTheme);
+      document.documentElement.className = newTheme;
+      
+      // Update icon if theme toggle exists
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        if (newTheme === 'theme-dark') {
+          themeToggle.innerHTML = '<i class="ms-Icon ms-Icon--Sunny" aria-hidden="true"></i>';
+        } else {
+          themeToggle.innerHTML = '<i class="ms-Icon ms-Icon--ClearNight" aria-hidden="true"></i>';
+        }
+      }
+      
+      // Force update syntax highlighting
+      if (typeof updateSyntaxCSS === 'function') {
+        updateSyntaxCSS();
+      }
+    }
+  });
 }); 

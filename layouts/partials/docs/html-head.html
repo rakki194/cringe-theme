@@ -118,19 +118,27 @@
 
 <!-- Dynamically load the right syntax CSS based on theme -->
 <script>
+  // Expose updateSyntaxCSS function globally
+  let updateSyntaxCSS;
+  
   (function() {
-    function updateSyntaxCSS() {
-      // Get current theme class from HTML element
-      const currentTheme = document.documentElement.className;
+    updateSyntaxCSS = function() {
+      // Get current theme using multiple methods to ensure it works
+      const currentClass = document.documentElement.className;
+      const hasDarkClass = document.documentElement.classList.contains('theme-dark');
+      const hasLightClass = document.documentElement.classList.contains('theme-light');
       
       // Get all syntax highlight links
       const syntaxLight = document.querySelector('link[href="/css/syntax-latte.css"]');
       const syntaxDark = document.querySelector('link[href="/css/syntax-mocha.css"]');
       
-      if (currentTheme === 'theme-dark') {
+      // Only proceed if we found the stylesheets
+      if (!syntaxLight || !syntaxDark) return;
+      
+      if (hasDarkClass || currentClass.includes('theme-dark')) {
         syntaxLight.media = 'not all';
         syntaxDark.media = 'all';
-      } else if (currentTheme === 'theme-light') {
+      } else if (hasLightClass || currentClass.includes('theme-light')) {
         syntaxLight.media = 'all';
         syntaxDark.media = 'not all';
       } else {
@@ -142,6 +150,25 @@
     
     // Check for theme on page load
     document.addEventListener('DOMContentLoaded', function() {
+      // Initialize on page load
+      updateSyntaxCSS();
+      
+      // Also try to apply saved theme immediately on load
+      const savedTheme = localStorage.getItem('theme-preference');
+      if (savedTheme) {
+        document.documentElement.classList.remove('theme-light', 'theme-dark');
+        document.documentElement.classList.add(savedTheme);
+        document.documentElement.className = savedTheme;
+      } else {
+        // No saved preference, use system preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const newTheme = prefersDark ? 'theme-dark' : 'theme-light';
+        document.documentElement.classList.remove('theme-light', 'theme-dark');
+        document.documentElement.classList.add(newTheme);
+        document.documentElement.className = newTheme;
+      }
+      
+      // Apply theme to syntax highlighting
       updateSyntaxCSS();
       
       // Listen for theme changes

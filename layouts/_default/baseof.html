@@ -62,6 +62,9 @@
   {{ partial "docs/inject/body" . }}
   <!-- blurhash -->
   <script type="module" src="/blurhash.min.js" async></script>
+  <!-- custom scripts -->
+  {{- $customJS := resources.Get "js/custom.js" | resources.Minify | resources.Fingerprint }}
+  <script defer src="{{ $customJS.RelPermalink }}" {{ template "integrity" $customJS }}></script>
 </body>
 </html>
 

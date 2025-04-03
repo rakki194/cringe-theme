@@ -103,6 +103,61 @@
 <link rel="stylesheet" href="/css/syntax-latte.css" media="(prefers-color-scheme: light)">
 <link rel="stylesheet" href="/css/syntax-mocha.css" media="(prefers-color-scheme: dark)">
 
+<!-- Theme-class based syntax highlighting -->
+<style>
+  html.theme-light .highlight pre { background-color: #eff1f5; }
+  html.theme-dark .highlight pre { background-color: #1e1e2e; }
+  
+  /* Override syntax highlighting based on theme class */
+  html.theme-light .chroma { background-color: #eff1f5; }
+  html.theme-light .chroma .err { color: #d20f39; background-color: #eff1f5 }
+  
+  html.theme-dark .chroma { background-color: #1e1e2e; }
+  html.theme-dark .chroma .err { color: #f38ba8; background-color: #1e1e2e }
+</style>
+
+<!-- Dynamically load the right syntax CSS based on theme -->
+<script>
+  (function() {
+    function updateSyntaxCSS() {
+      // Get current theme class from HTML element
+      const currentTheme = document.documentElement.className;
+      
+      // Get all syntax highlight links
+      const syntaxLight = document.querySelector('link[href="/css/syntax-latte.css"]');
+      const syntaxDark = document.querySelector('link[href="/css/syntax-mocha.css"]');
+      
+      if (currentTheme === 'theme-dark') {
+        syntaxLight.media = 'not all';
+        syntaxDark.media = 'all';
+      } else if (currentTheme === 'theme-light') {
+        syntaxLight.media = 'all';
+        syntaxDark.media = 'not all';
+      } else {
+        // Use system preference if no theme class
+        syntaxLight.media = '(prefers-color-scheme: light)';
+        syntaxDark.media = '(prefers-color-scheme: dark)';
+      }
+    }
+    
+    // Check for theme on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      updateSyntaxCSS();
+      
+      // Listen for theme changes
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.attributeName === 'class') {
+            updateSyntaxCSS();
+          }
+        });
+      });
+      
+      observer.observe(document.documentElement, { attributes: true });
+    });
+  })();
+</script>
+
 {{- if default true .Site.Params.BookSearch -}}
   {{- $searchJSFile := printf "%s.search.js" .Language.Lang }}
   {{- $searchJS := resources.Get "search.js" | resources.ExecuteAsTemplate $searchJSFile . | resources.Minify | resources.Fingerprint }}

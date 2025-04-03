@@ -1,5 +1,6 @@
 @import "defaults";
 @import "themes/{{ default "light" .Site.Params.BookTheme }}";
+@import "theme-override";
 
 @import "normalize";
 @import "utils";

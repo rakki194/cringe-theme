@@ -1,0 +1,42 @@
+/* 
+ * Theme Override CSS
+ * This file provides styles that override the system preference
+ * when a user explicitly chooses a theme
+ */
+
+/* Light theme styles that override system preference */
+html.theme-light {
+  @include theme-light;
+}
+
+/* Dark theme styles that override system preference */
+html.theme-dark {
+  @include theme-dark;
+}
+
+/* Additional styles for syntax highlighting based on user preference */
+html.theme-light .highlight {
+  background-color: var(--body-background);
+}
+
+html.theme-dark .highlight {
+  background-color: var(--body-background);
+}
+
+/* Make sure code blocks use theme colors too */
+html.theme-light pre {
+  background-color: var(--gray-100);
+}
+
+html.theme-dark pre {
+  background-color: var(--gray-100);
+}
+
+/* Theme toggle button styles for different states */
+html.theme-light #theme-toggle:hover {
+  background-color: var(--gray-500);
+}
+
+html.theme-dark #theme-toggle:hover {
+  background-color: var(--gray-500);
+} 

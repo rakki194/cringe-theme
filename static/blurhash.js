@@ -171,14 +171,22 @@ function renderBlurHash(blurHash, canvas, width, height) {
 
 function initializeBlurHashCanvas(canvas) {
     try {
+        if (!canvas || !canvas.parentElement) {
+            console.warn('Canvas or parent element is missing:', canvas);
+            return;
+        }
+
+        // Find the closest image container parent
         const container = canvas.closest('.image-container');
         if (!container) {
-            throw new Error('Canvas must be inside .image-container');
+            console.warn(`Canvas is not inside .image-container - parent is:`, canvas.parentElement);
+            return;
         }
 
         const blurHash = canvas.dataset.blurhash;
         if (!blurHash) {
-            throw new Error('Missing blurhash data attribute');
+            console.warn('Missing blurhash data attribute on canvas:', canvas);
+            return;
         }
 
         const width = parseInt(container.dataset.width) || 400;
@@ -205,8 +213,12 @@ function initializeBlurHashCanvas(canvas) {
         // Queue the blurhash rendering in the next frame if needed
         if (!canvas.hasAttribute('data-rendered')) {
             requestAnimationFrame(() => {
-                renderBlurHash(blurHash, canvas, width, height);
-                canvas.setAttribute('data-rendered', 'true');
+                try {
+                    renderBlurHash(blurHash, canvas, width, height);
+                    canvas.setAttribute('data-rendered', 'true');
+                } catch (e) {
+                    console.error('Failed to render BlurHash:', e);
+                }
             });
         }
     } catch (error) {
@@ -216,28 +228,10 @@ function initializeBlurHashCanvas(canvas) {
 
 // Document ready event handler for BlurHash initialization
 document.addEventListener('DOMContentLoaded', () => {
-    // Find all BlurHash canvases that aren't rendered yet
+    // Find all BlurHash canvases that aren't rendered yet (allow for both hyphenated and non-hyphenated class names)
     const existingCanvases = document.querySelectorAll('canvas.blur-hash:not([data-rendered])');
     if (existingCanvases.length > 0) {
-        existingCanvases.forEach(canvas => {
-            try {
-                const container = canvas.closest('.image-container');
-                if (container) {
-                    const width = parseInt(container.dataset.width) || 400;
-                    const height = parseInt(container.dataset.height) || 300;
-                    container.style.maxWidth = width + 'px';
-                    container.style.aspectRatio = width + '/' + height;
-                    
-                    // Only set canvas dimensions if not already set
-                    if (canvas.width !== width || canvas.height !== height) {
-                        canvas.width = width;
-                        canvas.height = height;
-                    }
-                }
-            } catch (error) {
-                console.error('Error setting initial canvas size:', error);
-            }
-        });
+        console.log(`Found ${existingCanvases.length} blurhash canvases to render`);
         
         // Process blurhash rendering in batches
         let index = 0;
@@ -247,7 +241,19 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (batch.length === 0) return;
             
-            batch.forEach(initializeBlurHashCanvas);
+            batch.forEach(canvas => {
+                try {
+                    // Ensure the canvas is properly attached to the DOM before initializing
+                    if (document.contains(canvas)) {
+                        initializeBlurHashCanvas(canvas);
+                    } else {
+                        console.warn('Canvas element is not in the document:', canvas);
+                    }
+                } catch (error) {
+                    console.error('Error processing canvas in batch:', error);
+                }
+            });
+            
             index += batchSize;
             
             if (index < existingCanvases.length) {
@@ -255,49 +261,64 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        processNextBatch();
+        // Small delay to ensure DOM is fully loaded
+        setTimeout(processNextBatch, 0);
     }
 });
 
 // Watch for new blurhash canvases being added
 const observer = new MutationObserver((mutations) => {
-    const newCanvases = new Set();
-    
-    for (const mutation of mutations) {
-        for (const node of mutation.addedNodes) {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                // Check if the added node is a blurhash canvas
-                if (node.matches('canvas.blur-hash:not([data-rendered])')) {
-                    newCanvases.add(node);
+    try {
+        const newCanvases = new Set();
+        
+        for (const mutation of mutations) {
+            for (const node of mutation.addedNodes) {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    // Check if the added node is a blurhash canvas with the correct class
+                    if (node.matches('canvas.blur-hash:not([data-rendered])')) {
+                        newCanvases.add(node);
+                    }
+                    // Check for blurhash canvases within the added node
+                    node.querySelectorAll('canvas.blur-hash:not([data-rendered])').forEach(canvas => {
+                        newCanvases.add(canvas);
+                    });
                 }
-                // Check for blurhash canvases within the added node
-                node.querySelectorAll('canvas.blur-hash:not([data-rendered])').forEach(canvas => {
-                    newCanvases.add(canvas);
+            }
+        }
+        
+        // Process new canvases in batches
+        if (newCanvases.size > 0) {
+            console.log(`Found ${newCanvases.size} new blurhash canvases from DOM mutations`);
+            let canvases = Array.from(newCanvases);
+            let index = 0;
+            
+            function processNextBatch() {
+                const batchSize = 5;
+                const batch = canvases.slice(index, index + batchSize);
+                
+                if (batch.length === 0) return;
+                
+                batch.forEach(canvas => {
+                    try {
+                        if (document.contains(canvas)) {
+                            initializeBlurHashCanvas(canvas);
+                        }
+                    } catch (error) {
+                        console.error('Error processing newly added canvas:', error);
+                    }
                 });
+                
+                index += batchSize;
+                
+                if (index < canvases.length) {
+                    requestAnimationFrame(processNextBatch);
+                }
             }
+            
+            processNextBatch();
         }
-    }
-    
-    // Process new canvases in batches
-    if (newCanvases.size > 0) {
-        let canvases = Array.from(newCanvases);
-        let index = 0;
-        
-        function processNextBatch() {
-            const batchSize = 5;
-            const batch = canvases.slice(index, index + batchSize);
-            
-            if (batch.length === 0) return;
-            
-            batch.forEach(initializeBlurHashCanvas);
-            index += batchSize;
-            
-            if (index < canvases.length) {
-                requestAnimationFrame(processNextBatch);
-            }
-        }
-        
-        processNextBatch();
+    } catch (error) {
+        console.error('Error in mutation observer:', error);
     }
 });
 

@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="{{ default .Site.Language.Lang .Site.LanguageCode  }}" dir="{{ default "ltr" .Site.Language.LanguageDirection }}">
 <head>
+  <!-- Initial theme setup before any resources load -->
+  <script>
+    (function() {
+      try {
+        var savedTheme = localStorage.getItem('theme-preference');
+        if (savedTheme) {
+          document.documentElement.className = savedTheme;
+        } else {
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.className = prefersDark ? 'theme-dark' : 'theme-light';
+          localStorage.setItem('theme-preference', prefersDark ? 'theme-dark' : 'theme-light');
+        }
+      } catch (e) {
+        console.error('Theme setup error:', e);
+      }
+    })();
+  </script>
   {{ partial "docs/html-head" . }}
   {{ partial "docs/inject/head" . }}
   {{ block "schema" . }}{{ end }}
@@ -64,7 +81,7 @@
   <script type="module" src="/blurhash.min.js" async></script>
   <!-- custom scripts -->
   {{- $customJS := resources.Get "js/custom.js" | resources.Minify | resources.Fingerprint }}
-  <script defer src="{{ $customJS.RelPermalink }}" {{ template "integrity" $customJS }}></script>
+  <script defer src="{{ $customJS.RelPermalink }}?{{ now.Unix }}" {{ template "integrity" $customJS }}></script>
 </body>
 </html>
 

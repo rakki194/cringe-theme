@@ -94,7 +94,7 @@
 
 <!-- Theme stylesheet, you can customize scss by creating `assets/custom.scss` in your website -->
 {{- $styles := resources.Get "book.scss" | resources.ExecuteAsTemplate "book.scss" . | css.Sass | resources.Minify | resources.Fingerprint }}
-<link rel="stylesheet" href="{{ $styles.RelPermalink }}" {{ template "integrity" $styles }}>
+<link rel="stylesheet" href="{{ $styles.RelPermalink }}?{{ now.Unix }}" {{ template "integrity" $styles }}>
 
 <!-- Microsoft Fabric Core Icons -->
 <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css">

@@ -22,27 +22,33 @@
   {{ end }}
 {{ else }}
   {{ $debug = print $debug "Trying header pattern. " }}
-  {{/* Try to extract content based on headers */}}
   
-  {{/* Look for Windows section - match from Windows header until Linux or macOS header */}}
-  {{ $winMatch := findRE "(?s)(### Windows.*?)(?:(?:^|\n)### Linux|(?:^|\n)### macOS|$)" $content 1 }}
-  {{ if $winMatch }}
-    {{ $winContent = index $winMatch 0 }}
-    {{ $debug = print $debug "Windows section found. " }}
-  {{ end }}
+  {{/* Split content by section headings */}}
+  {{ $sections := split $content "\n### " }}
   
-  {{/* Look for Linux section - match from Linux header until macOS header */}}
-  {{ $linuxMatch := findRE "(?s)((?:^|\n)### Linux.*?)(?:(?:^|\n)### macOS|$)" $content 1 }}
-  {{ if $linuxMatch }}
-    {{ $linuxContent = index $linuxMatch 0 }}
-    {{ $debug = print $debug "Linux section found. " }}
-  {{ end }}
-  
-  {{/* Look for macOS section - match from macOS header until end */}}
-  {{ $macMatch := findRE "(?s)((?:^|\n)### macOS.*?)$" $content 1 }}
-  {{ if $macMatch }}
-    {{ $macContent = index $macMatch 0 }}
-    {{ $debug = print $debug "macOS section found. " }}
+  {{/* Process each section */}}
+  {{ range $index, $section := $sections }}
+    {{ if $index }} 
+      {{/* For all but the first section, prepend the "### " we removed during split */}}
+      {{ $section = print "### " $section }}
+    {{ end }}
+    
+    {{ if or (hasPrefix $section "### Windows") (hasPrefix $section "Windows") }}
+      {{ $winContent = $section }}
+      {{ $debug = print $debug "Windows section found. " }}
+    {{ else if or (hasPrefix $section "### Linux") (hasPrefix $section "Linux") }}
+      {{ $linuxContent = $section }}
+      {{ $debug = print $debug "Linux section found. " }}
+    {{ else if or (hasPrefix $section "### macOS") (hasPrefix $section "macOS") }}
+      {{ $macContent = $section }}
+      {{ $debug = print $debug "macOS section found. " }}
+    {{ else if eq $index 0 }}
+      {{/* If first section doesn't match any OS, it might be intro content */}}
+      {{ $winContent = $section }}
+      {{ $linuxContent = $section }}
+      {{ $macContent = $section }}
+      {{ $debug = print $debug "Intro content found. " }}
+    {{ end }}
   {{ end }}
   
   {{/* If no content is found for any section, use the full content */}}
@@ -75,7 +81,7 @@
 
 <!-- Debug Info - Only visible in development mode -->
 {{ if eq hugo.Environment "development" }}
-<div style="font-size: 0.8rem; margin-top: 0.5rem; padding: 0.5rem; background: #f8f8f8; border: 1px solid #ddd; display: none;">
+<div style="font-size: 0.8rem; margin-top: 0.5rem; color: #1d1d1d; padding: 0.5rem; background: #88a9c5; border: 1px solid #1d1d1d;">
     <strong>Debug:</strong> {{ $debug }}
 </div>
 {{ end }}

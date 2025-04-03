@@ -20,35 +20,58 @@
 
 <script>
 function selectOS(os, id) {
-    // Hide all OS sections
-    document.querySelectorAll(`.os-section[id$="-${id}"]`).forEach(section => {
-        section.classList.remove('active');
-    });
-    
-    // Show the selected OS section
-    document.getElementById(`${os}-${id}`).classList.add('active');
-    
-    // Update tab classes
-    document.querySelectorAll(`.os-tab`).forEach(tab => {
-        tab.classList.remove('active');
-    });
-    
-    // Update the active tab
-    document.querySelectorAll(`.os-tab.${os}`).forEach(tab => {
-        tab.classList.add('active');
-    });
-    
-    // Store the selection in localStorage
-    localStorage.setItem('preferredOS', os);
+    try {
+        // Hide all OS sections
+        document.querySelectorAll(`.os-section[id$="-${id}"]`).forEach(section => {
+            section.classList.remove('active');
+        });
+        
+        // Show the selected OS section
+        const selectedSection = document.getElementById(`${os}-${id}`);
+        if (selectedSection) {
+            selectedSection.classList.add('active');
+        } else {
+            console.warn(`Section with ID ${os}-${id} not found`);
+        }
+        
+        // Find the parent container of the clicked button
+        const container = document.querySelector(`.os-section[id$="-${id}"]`)?.closest('.os-instructions');
+        if (!container) {
+            console.warn(`Container for ${id} not found`);
+            return;
+        }
+        
+        // Update tab classes within this container only
+        container.querySelectorAll(`.os-tab`).forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Update the active tab within this container only
+        container.querySelectorAll(`.os-tab.${os}`).forEach(tab => {
+            tab.classList.add('active');
+        });
+        
+        // Store the selection in localStorage
+        localStorage.setItem('preferredOS', os);
+    } catch (error) {
+        console.error(`Error in selectOS function: ${error.message}`);
+    }
 }
 
 // Set the initial OS based on stored preference or default to windows
 document.addEventListener('DOMContentLoaded', function() {
-    const preferredOS = localStorage.getItem('preferredOS') || 'windows';
-    document.querySelectorAll('.os-instructions').forEach(container => {
-        const id = container.querySelector('.os-section').id.split('-').pop();
-        selectOS(preferredOS, id);
-    });
+    try {
+        const preferredOS = localStorage.getItem('preferredOS') || 'windows';
+        document.querySelectorAll('.os-instructions').forEach(container => {
+            const section = container.querySelector('.os-section');
+            if (section) {
+                const id = section.id.split('-').pop();
+                selectOS(preferredOS, id);
+            }
+        });
+    } catch (error) {
+        console.error(`Error in OS initialization: ${error.message}`);
+    }
 });
 </script>
 

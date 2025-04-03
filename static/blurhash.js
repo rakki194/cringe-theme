@@ -214,8 +214,9 @@ function initializeBlurHashCanvas(canvas) {
     }
 }
 
-// Process any existing blurhash canvases immediately
+// Document ready event handler for BlurHash initialization
 document.addEventListener('DOMContentLoaded', () => {
+    // Find all BlurHash canvases that aren't rendered yet
     const existingCanvases = document.querySelectorAll('canvas.blur-hash:not([data-rendered])');
     if (existingCanvases.length > 0) {
         existingCanvases.forEach(canvas => {

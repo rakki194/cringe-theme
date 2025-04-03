@@ -1,15 +1,38 @@
 @import "defaults";
 
-// Import auto theme which applies system preference by default
-@import "themes/auto";
-
-// These styles are properly applied when theme class is set via JavaScript
-html.theme-light {
-  @import "themes/light";
+// Remove the auto theme import and handle directly
+// Define basic light theme for initial render
+:root {
+  @include theme-light;
 }
 
+// System preference for dark mode
+@media (prefers-color-scheme: dark) {
+  :root {
+    @include theme-dark;
+  }
+}
+
+// User explicitly chose light theme - override system preference
+html.theme-light {
+  @include theme-light;
+  
+  // Any element nested under html (effectively everything)
+  * {
+    --body-background: #eff1f5;
+    --body-font-color: #4c4f69;
+  }
+}
+
+// User explicitly chose dark theme - override system preference
 html.theme-dark {
-  @import "themes/dark";
+  @include theme-dark;
+  
+  // Any element nested under html (effectively everything)
+  * {
+    --body-background: #1e1e2e;
+    --body-font-color: #cdd6f4;
+  }
 }
 
 @import "theme-override";

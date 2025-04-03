@@ -4,32 +4,69 @@
  * when a user explicitly chooses a theme
  */
 
-/* Light theme styles that override system preference */
+/* Light theme styles that override system preference - added !important to ensure it overrides */
 html.theme-light {
-  @include theme-light;
+  --gray-100: #f8f9fa !important;
+  --gray-200: #e9ecef !important;
+  --gray-500: #adb5bd !important;
+  --color-link: #1e66f5 !important;
+  --color-visited-link: #8839ef !important;
+  --body-background: #eff1f5 !important;
+  --body-font-color: #4c4f69 !important;
+  --icon-filter: none !important;
+  --hint-color-info: #1e66f5 !important;
+  --hint-color-warning: #dc8a78 !important;
+  --hint-color-danger: #d20f39 !important;
+  
+  background-color: #eff1f5 !important;
+  color: #4c4f69 !important;
 }
 
-/* Dark theme styles that override system preference */
+/* Dark theme styles that override system preference - added !important to ensure it overrides */
 html.theme-dark {
-  @include theme-dark;
+  --gray-100: #313244 !important;
+  --gray-200: #45475a !important;
+  --gray-500: #6c7086 !important;
+  --color-link: #89b4fa !important;
+  --color-visited-link: #cba6f7 !important;
+  --body-background: #1e1e2e !important;
+  --body-font-color: #cdd6f4 !important;
+  --icon-filter: brightness(0) invert(1) !important;
+  --hint-color-info: #89b4fa !important;
+  --hint-color-warning: #fab387 !important;
+  --hint-color-danger: #f38ba8 !important;
+  
+  background-color: #1e1e2e !important;
+  color: #cdd6f4 !important;
 }
 
 /* Additional styles for syntax highlighting based on user preference */
 html.theme-light .highlight {
-  background-color: var(--body-background);
+  background-color: var(--body-background) !important;
 }
 
 html.theme-dark .highlight {
-  background-color: var(--body-background);
+  background-color: var(--body-background) !important;
 }
 
 /* Make sure code blocks use theme colors too */
 html.theme-light pre {
-  background-color: var(--gray-100);
+  background-color: var(--gray-100) !important;
 }
 
 html.theme-dark pre {
-  background-color: var(--gray-100);
+  background-color: var(--gray-100) !important;
+}
+
+/* Body elements must also have correct background and color */
+html.theme-light body {
+  background-color: #eff1f5 !important;
+  color: #4c4f69 !important;
+}
+
+html.theme-dark body {
+  background-color: #1e1e2e !important;
+  color: #cdd6f4 !important;
 }
 
 /* Theme toggle button styles for different states */

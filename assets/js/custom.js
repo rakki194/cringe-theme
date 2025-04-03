@@ -14,6 +14,52 @@ document.addEventListener('DOMContentLoaded', function() {
     return null;
   }
 
+  // Function to update all elements with hardcoded colors
+  function updateElementStyles(newTheme) {
+    // Root elements
+    if (newTheme === 'theme-light') {
+      document.documentElement.style.backgroundColor = '#eff1f5';
+      document.documentElement.style.color = '#4c4f69';
+      document.body.style.backgroundColor = '#eff1f5';
+      document.body.style.color = '#4c4f69';
+    } else {
+      document.documentElement.style.backgroundColor = '#1e1e2e';
+      document.documentElement.style.color = '#cdd6f4';
+      document.body.style.backgroundColor = '#1e1e2e';
+      document.body.style.color = '#cdd6f4';
+    }
+    
+    // Update content elements that may have internal styles
+    const articleContent = document.querySelector('.book-article-content');
+    if (articleContent) {
+      if (newTheme === 'theme-light') {
+        articleContent.style.backgroundColor = '#eff1f5';
+        articleContent.style.color = '#4c4f69';
+      } else {
+        articleContent.style.backgroundColor = '#1e1e2e';
+        articleContent.style.color = '#cdd6f4';
+      }
+    }
+    
+    // Update all section elements
+    const sections = document.querySelectorAll('section, article, div.book-page, aside');
+    sections.forEach(section => {
+      if (newTheme === 'theme-light') {
+        section.style.backgroundColor = '#eff1f5';
+        section.style.color = '#4c4f69';
+      } else {
+        section.style.backgroundColor = '#1e1e2e';
+        section.style.color = '#cdd6f4';
+      }
+    });
+    
+    // Force CSS variables update by toggling a class
+    document.body.classList.add('theme-update');
+    setTimeout(() => {
+      document.body.classList.remove('theme-update');
+    }, 10);
+  }
+
   // Theme Toggle Functionality
   function initThemeToggle() {
     // Create theme toggle button
@@ -53,6 +99,10 @@ document.addEventListener('DOMContentLoaded', function() {
       document.documentElement.classList.remove('theme-light', 'theme-dark');
       document.documentElement.classList.add(savedTheme);
       document.documentElement.className = savedTheme; // Ensure className is fully replaced
+      
+      // Apply direct styles to all elements
+      updateElementStyles(savedTheme);
+      
       updateThemeToggleIcon(savedTheme);
     } else {
       // No saved preference, use system preference
@@ -61,6 +111,10 @@ document.addEventListener('DOMContentLoaded', function() {
       document.documentElement.classList.remove('theme-light', 'theme-dark');
       document.documentElement.classList.add(newTheme);
       document.documentElement.className = newTheme; // Ensure className is fully replaced
+      
+      // Apply direct styles to all elements
+      updateElementStyles(newTheme);
+      
       updateThemeToggleIcon(newTheme);
       
       // Save the initial system preference
@@ -77,6 +131,9 @@ document.addEventListener('DOMContentLoaded', function() {
       document.documentElement.classList.add(newTheme);
       document.documentElement.className = newTheme;
       
+      // Apply direct styles to all relevant elements
+      updateElementStyles(newTheme);
+      
       // Save preference
       localStorage.setItem('theme-preference', newTheme);
       
@@ -87,6 +144,12 @@ document.addEventListener('DOMContentLoaded', function() {
       if (typeof updateSyntaxCSS === 'function') {
         updateSyntaxCSS();
       }
+      
+      // Force page refresh to ensure all elements update
+      // Only if we're in production mode - uncomment if needed
+      // if (window.location.hostname !== 'localhost') {
+      //   window.location.reload();
+      // }
     });
     
     function updateThemeToggleIcon(theme) {
@@ -111,6 +174,12 @@ document.addEventListener('DOMContentLoaded', function() {
       document.documentElement.classList.remove('theme-light', 'theme-dark');
       document.documentElement.classList.add(newTheme);
       document.documentElement.className = newTheme;
+      
+      // Apply direct styles to all elements
+      updateElementStyles(newTheme);
+      
+      // Save the preference
+      localStorage.setItem('theme-preference', newTheme);
       
       // Update icon if theme toggle exists
       const themeToggle = document.getElementById('theme-toggle');

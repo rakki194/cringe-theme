@@ -1,19 +1,56 @@
 {{ $id := .Get 0 }}
 
-{{/* Split the content by comments */}}
+{{/* Get raw content */}}
 {{ $content := .Inner }}
-{{ $parts := split $content "<!-- linux -->" }}
-{{ $winContent := index $parts 0 }}
-
+{{ $winContent := "" }}
 {{ $linuxContent := "" }}
 {{ $macContent := "" }}
 
+{{/* Debug variable to track extraction process */}}
+{{ $debug := "" }}
+
+{{/* Try splitting by explicit comments first */}}
+{{ $parts := split $content "<!-- linux -->" }}
 {{ if gt (len $parts) 1 }}
+  {{ $winContent = index $parts 0 }}
   {{ $linuxParts := split (index $parts 1) "<!-- mac -->" }}
   {{ $linuxContent = index $linuxParts 0 }}
+  {{ $debug = print $debug "Split by comments succeeded. " }}
   
   {{ if gt (len $linuxParts) 1 }}
     {{ $macContent = index $linuxParts 1 }}
+  {{ end }}
+{{ else }}
+  {{ $debug = print $debug "Trying header pattern. " }}
+  {{/* Try to extract content based on headers */}}
+  
+  {{/* Look for Windows section - match from Windows header until Linux or macOS header */}}
+  {{ $winMatch := findRE "(?s)(### Windows.*?)(?:(?:^|\n)### Linux|(?:^|\n)### macOS|$)" $content 1 }}
+  {{ if $winMatch }}
+    {{ $winContent = index $winMatch 0 }}
+    {{ $debug = print $debug "Windows section found. " }}
+  {{ end }}
+  
+  {{/* Look for Linux section - match from Linux header until macOS header */}}
+  {{ $linuxMatch := findRE "(?s)((?:^|\n)### Linux.*?)(?:(?:^|\n)### macOS|$)" $content 1 }}
+  {{ if $linuxMatch }}
+    {{ $linuxContent = index $linuxMatch 0 }}
+    {{ $debug = print $debug "Linux section found. " }}
+  {{ end }}
+  
+  {{/* Look for macOS section - match from macOS header until end */}}
+  {{ $macMatch := findRE "(?s)((?:^|\n)### macOS.*?)$" $content 1 }}
+  {{ if $macMatch }}
+    {{ $macContent = index $macMatch 0 }}
+    {{ $debug = print $debug "macOS section found. " }}
+  {{ end }}
+  
+  {{/* If no content is found for any section, use the full content */}}
+  {{ if and (eq $winContent "") (eq $linuxContent "") (eq $macContent "") }}
+    {{ $winContent = $content }}
+    {{ $linuxContent = $content }}
+    {{ $macContent = $content }}
+    {{ $debug = print $debug "No sections found, using full content. " }}
   {{ end }}
 {{ end }}
 
@@ -35,6 +72,13 @@
         </div>
     </div>
 </div>
+
+<!-- Debug Info - Only visible in development mode -->
+{{ if eq hugo.Environment "development" }}
+<div style="font-size: 0.8rem; margin-top: 0.5rem; padding: 0.5rem; background: #f8f8f8; border: 1px solid #ddd; display: none;">
+    <strong>Debug:</strong> {{ $debug }}
+</div>
+{{ end }}
 
 <script>
 // Initialize script only once per page

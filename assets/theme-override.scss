@@ -52,6 +52,11 @@ html.theme-dark .highlight {
 /* Make sure code blocks use theme colors too */
 html.theme-light pre {
   background-color: var(--gray-100) !important;
+  color: #313244 !important; /* Darker text for better contrast in light mode */
+}
+
+html.theme-light code {
+  color: #313244 !important; /* Darker text for inline code in light mode */
 }
 
 html.theme-dark pre {
@@ -141,9 +146,16 @@ html.theme-auto .highlight {
 html.theme-auto pre {
   @media (prefers-color-scheme: light) {
     background-color: var(--gray-100) !important;
+    color: #313244 !important; /* Darker text for better contrast in light mode */
   }
   
   @media (prefers-color-scheme: dark) {
     background-color: var(--gray-100) !important;
+  }
+}
+
+html.theme-auto code {
+  @media (prefers-color-scheme: light) {
+    color: #313244 !important; /* Darker text for inline code in light mode */
   }
 } 

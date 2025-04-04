@@ -15,6 +15,9 @@
         loading="lazy"
         width="1200"
         height="400"
+        {{ with $.Params.image_vertical_offset }}
+        style="object-position: center {{ . }};"
+        {{ end }}
         {{ if $.Params.blurhash }}
         onload="this.previousElementSibling.style.display = 'none'; this.style.opacity = 1;"
         {{ end }}

@@ -1,3 +1,22 @@
+{{/* 
+  Section shortcode for displaying page lists with thumbnails
+  
+  Supports the following page parameters:
+  - image: URL of the image to display as thumbnail
+  - blurhash: BlurHash string for image placeholder
+  - imageAlt: Alt text for the image
+  - thumbnail_vertical_offset: CSS value for vertical positioning of the thumbnail (e.g. "-50px")
+  - thumbnail_horizontal_offset: CSS value for horizontal positioning of the thumbnail (e.g. "left", "center", "right", "10px")
+  
+  Usage in page frontmatter:
+  ---
+  image: "https://example.com/image.jpg"
+  blurhash: "LlI#_f.TNGM{u6K7NGsmnixaf,xZ"
+  thumbnail_vertical_offset: "-50px"
+  thumbnail_horizontal_offset: "center"
+  ---
+*/}}
+
 <dl>
   {{ range .Page.Pages }}
   {{ if not (hasPrefix .Title "(redirect)") }}
@@ -11,12 +30,25 @@
           width="600" 
           height="600"
         ></canvas>
+        {{ $page := . }}
         <img 
           src="{{ .Params.image }}" 
           loading="lazy" 
           width="50" 
           height="50"
           alt="{{ .Params.imageAlt | default "" }}"
+          {{ with .Params.thumbnail_horizontal_offset }}
+          {{ $h_offset := . }}
+          {{ with $page.Params.thumbnail_vertical_offset }}
+          style="object-position: {{ $h_offset }} {{ . }};"
+          {{ else }}
+          style="object-position: {{ $h_offset }} center;"
+          {{ end }}
+          {{ else }}
+          {{ with .Params.thumbnail_vertical_offset }}
+          style="object-position: center {{ . }};"
+          {{ end }}
+          {{ end }}
           onload="this.previousElementSibling.style.display = 'none'; this.style.opacity = 1;"
         >
       </div>

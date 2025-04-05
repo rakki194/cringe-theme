@@ -76,10 +76,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Style the button
     themeToggle.style.position = 'fixed';
-    themeToggle.style.top = '1rem';
-    themeToggle.style.right = '1rem';
+    themeToggle.style.bottom = '1.5rem';
+    themeToggle.style.right = '1.5rem';
     themeToggle.style.zIndex = '1000';
-    themeToggle.style.background = 'var(--gray-200)';
+    themeToggle.style.background = 'transparent';
     themeToggle.style.border = 'none';
     themeToggle.style.borderRadius = '50%';
     themeToggle.style.width = '2.5rem';
@@ -88,8 +88,12 @@ document.addEventListener('DOMContentLoaded', function() {
     themeToggle.style.alignItems = 'center';
     themeToggle.style.justifyContent = 'center';
     themeToggle.style.cursor = 'pointer';
-    themeToggle.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-    themeToggle.style.transition = 'background-color 0.3s ease';
+    themeToggle.style.transition = 'transform 0.3s ease, color 0.2s ease, opacity 0.2s ease, box-shadow 0.3s ease';
+    themeToggle.style.fontSize = '1.25rem';
+    // Add subtle backdrop filter effect for modern look
+    themeToggle.style.backdropFilter = 'blur(4px)';
+    themeToggle.style.webkitBackdropFilter = 'blur(4px)';
+    themeToggle.style.boxShadow = '0 4px 6px rgba(0,0,0,0.08)';
     
     // Add to body
     document.body.appendChild(themeToggle);
@@ -122,6 +126,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add click event
     themeToggle.addEventListener('click', function() {
+      // Modern fade out/in animation
+      this.style.opacity = '0';
+      this.style.transform = 'scale(0.8)';
+      
+      setTimeout(() => {
+        // Reset animation after theme change is applied
+        this.style.opacity = '1';
+        this.style.transform = 'scale(1)';
+      }, 300);
+      
       const currentTheme = document.documentElement.className;
       let newTheme;
       
@@ -160,17 +174,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function updateThemeToggleIcon(theme) {
       if (theme === 'theme-auto') {
-        // Icon for auto/system mode
-        themeToggle.innerHTML = '<i class="ms-Icon ms-Icon--PowerApps2019" aria-hidden="true"></i>';
-        themeToggle.style.color = 'var(--color-link)';
+        // Icon for auto/system mode - changing to a more visible icon
+        themeToggle.innerHTML = '<i class="ms-Icon ms-Icon--Brightness" aria-hidden="true"></i>';
+        
+        // Set color based on actual system preference for better visibility
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          themeToggle.style.color = '#d8b4fe'; // Very light purple for dark mode (much brighter)
+        } else {
+          themeToggle.style.color = '#7c3aed'; // Darker purple for light mode
+        }
+        
         themeToggle.title = 'Currently following system preference. Click to switch to light mode.';
       } else if (theme.includes('theme-dark')) {
         themeToggle.innerHTML = '<i class="ms-Icon ms-Icon--Sunny" aria-hidden="true"></i>';
-        themeToggle.style.color = 'var(--color-link)';
+        themeToggle.style.color = '#fbbf24'; // Modern amber/yellow for dark mode (sun icon)
         themeToggle.title = 'Currently using dark mode. Click to switch to auto mode.';
       } else {
         themeToggle.innerHTML = '<i class="ms-Icon ms-Icon--ClearNight" aria-hidden="true"></i>';
-        themeToggle.style.color = 'var(--color-link)';
+        themeToggle.style.color = '#3b82f6'; // Modern blue for light mode (moon icon)
         themeToggle.title = 'Currently using light mode. Click to switch to dark mode.';
       }
     }

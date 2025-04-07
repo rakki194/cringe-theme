@@ -68,7 +68,12 @@
     "name": "{{ .Site.Title }}",
     "logo": {
       "@type": "ImageObject",
-      "url": "{{ "logo.png" | absURL }}"
+      "url": "{{ "logo.png" | absURL }}",
+      "copyrightNotice": "© {{ now.Format "2006" }} {{ .Site.Title }}",
+      "creator": {
+        "@type": "Person",
+        "name": "{{ .Site.Params.author | default .Site.Title }}"
+      }
     }
   }{{ if not .IsHome }},
   "author": {
@@ -78,7 +83,8 @@
   "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "{{ .Permalink }}"
-  }{{ end }}
+  },
+  "copyrightNotice": "© {{ now.Format "2006" }} {{ .Site.Title }}"{{ end }}
 }
 </script>
 

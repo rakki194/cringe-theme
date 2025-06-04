@@ -177,20 +177,21 @@ function initializeBlurHashCanvas(canvas) {
         }
 
         // Find the closest image container parent
-        const container = canvas.closest('.image-container');
+        const container = canvas.closest('.image-container, .book-cover-image');
         if (!container) {
-            console.warn(`Canvas is not inside .image-container - parent is:`, canvas.parentElement);
+            console.warn(`Canvas is not inside .image-container or .book-cover-image - parent is:`, canvas.parentElement);
             return;
         }
 
-        const blurHash = canvas.dataset.blurhash;
-        if (!blurHash) {
-            console.warn('Missing blurhash data attribute on canvas:', canvas);
-            return;
+        // Prefer explicit width/height attributes on the canvas for .book-cover-image
+        let width, height;
+        if (container.classList.contains('book-cover-image')) {
+            width = parseInt(canvas.getAttribute('width')) || 1200;
+            height = parseInt(canvas.getAttribute('height')) || 400;
+        } else {
+            width = parseInt(container.dataset.width) || 400;
+            height = parseInt(container.dataset.height) || 300;
         }
-
-        const width = parseInt(container.dataset.width) || 400;
-        const height = parseInt(container.dataset.height) || 300;
         
         // Set container dimensions
         container.style.maxWidth = width + 'px';

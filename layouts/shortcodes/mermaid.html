@@ -2,7 +2,60 @@
 <!-- Include mermaid only first time -->
 <script src="{{ "mermaid.min.js" | relURL }}"></script>
 {{ with resources.Get "mermaid.json" }}
-  <script>mermaid.initialize({{ .Content | safeJS }})</script>
+  <script>
+    //<![CDATA[
+    (function() {
+      // Store config as a string to avoid Hugo parsing issues
+      var mermaidConfigStr = `{{ .Content | safeJS }}`;
+      var mermaidConfig = JSON.parse(mermaidConfigStr);
+      delete mermaidConfig.theme;
+      // Function to get theme from <html> class
+      function getMermaidTheme() {
+        var htmlClass = document.documentElement.className;
+        if (htmlClass.includes('theme-dark')) {
+          return 'dark';
+        } else if (htmlClass.includes('theme-light')) {
+          return 'default';
+        } else if (htmlClass.includes('theme-auto')) {
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
+        } else {
+          // Fallback: use system preference
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
+        }
+      }
+      // Initialize Mermaid with dynamic theme
+      function initMermaid() {
+        mermaidConfig.theme = getMermaidTheme();
+        mermaid.initialize(mermaidConfig);
+      }
+      // Initial load
+      initMermaid();
+      // Listen for theme changes via MutationObserver
+      var lastTheme = getMermaidTheme();
+      var observer = new MutationObserver(function(mutations) {
+        var newTheme = getMermaidTheme();
+        if (newTheme !== lastTheme) {
+          lastTheme = newTheme;
+          initMermaid();
+          // Re-render all diagrams
+          document.querySelectorAll('pre.mermaid').forEach(function(el) {
+            mermaid.init(undefined, el);
+          });
+        }
+      });
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+      // Also listen for system color scheme changes if in auto mode
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+        if (document.documentElement.className.includes('theme-auto')) {
+          initMermaid();
+          document.querySelectorAll('pre.mermaid').forEach(function(el) {
+            mermaid.init(undefined, el);
+          });
+        }
+      });
+    })();
+    //]]>
+  </script>
 {{ end }}
 {{ .Page.Scratch.Set "mermaid" true }}
 {{ end }}

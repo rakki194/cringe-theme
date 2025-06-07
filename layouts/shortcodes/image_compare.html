@@ -1,0 +1,77 @@
+{{ $uid := .Get "unique_id" | default (now.UnixNano) }}
+<div id="image-compare-container-{{ $uid }}" class="image-compare-container" style="position:relative; width:100%; max-width:600px; margin:auto;">
+  <canvas id="image-compare-canvas-{{ $uid }}" style="width:100%; height:auto; display:block;"></canvas>
+  {{ with .Get "alt" }}<div class="image-compare-alt" style="text-align:center; margin-top:8px; color:#888; font-size:0.95em;">{{ . }}</div>{{ end }}
+</div>
+
+<script>
+(function waitForFabric() {
+  if (!window.fabric || !window.fabric.FabricImage) {
+    setTimeout(waitForFabric, 30);
+    return;
+  }
+  var uid = '{{ $uid }}';
+  var container = document.getElementById('image-compare-container-' + uid);
+  var canvasElem = document.getElementById('image-compare-canvas-' + uid);
+  var imgAUrl = '{{ .Get "a" }}';
+  var imgBUrl = '{{ .Get "b" }}';
+  var fabricCanvas, imgA, imgB, clipRect;
+  var width = 0, height = 0;
+  var splitPercent = 0.5; // Default to 50%
+
+  function resizeCanvasToImage(img) {
+    if (!canvasElem) return;
+    canvasElem.width = img.width;
+    canvasElem.height = img.height;
+    canvasElem.style.height = 'auto';
+    container.style.maxWidth = img.width + 'px';
+  }
+
+  function updateClip(percent) {
+    if (clipRect && imgB) {
+      clipRect.set({ width: imgB.width * percent });
+      fabricCanvas.requestRenderAll();
+    }
+  }
+
+  function handleMouseMove(e) {
+    var rect = container.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var percent = Math.max(0, Math.min(1, x / width));
+    splitPercent = percent;
+    updateClip(splitPercent);
+  }
+
+  Promise.all([
+    window.fabric.FabricImage.fromURL(imgAUrl, { crossOrigin: 'anonymous' }),
+    window.fabric.FabricImage.fromURL(imgBUrl, { crossOrigin: 'anonymous' })
+  ]).then(function([oImgA, oImgB]) {
+    imgA = oImgA;
+    imgB = oImgB;
+    width = Math.min(imgA.width, imgB.width);
+    height = Math.min(imgA.height, imgB.height);
+    imgA.set({ left: 0, top: 0, selectable: false, evented: false, scaleX: width/imgA.width, scaleY: height/imgA.height });
+    imgB.set({ left: 0, top: 0, selectable: false, evented: false, scaleX: width/imgB.width, scaleY: height/imgB.height });
+    resizeCanvasToImage({ width: width, height: height });
+    fabricCanvas = new window.fabric.Canvas(canvasElem, { selection: false, hoverCursor: 'default' });
+    fabricCanvas.setWidth(width);
+    fabricCanvas.setHeight(height);
+    fabricCanvas.add(imgA);
+    clipRect = new window.fabric.Rect({ left: 0, top: 0, width: width * splitPercent, height: height, absolutePositioned: true });
+    imgB.set({ clipPath: clipRect });
+    fabricCanvas.add(imgB);
+    fabricCanvas.renderAll();
+    container.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('resize', function() {
+      var rect = container.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+    });
+  });
+})();
+</script>
+
+<style>
+.image-compare-container { user-select: none; }
+/* Removed slider styles */
+</style> 

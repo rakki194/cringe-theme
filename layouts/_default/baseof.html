@@ -116,8 +116,9 @@
   </main>
 
   {{ partial "docs/inject/body" . }}
-  <!-- blurhash -->
+  <!-- blurhash, fabric -->
   <script type="module" src="/blurhash.min.js" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/fabric@latest/dist/index.min.js"></script>
   <!-- custom scripts -->
   {{- $customJS := resources.Get "js/custom.js" | resources.Minify | resources.Fingerprint }}
   <script defer src="{{ $customJS.RelPermalink }}?{{ now.Unix }}" {{ template "integrity" $customJS }}></script>

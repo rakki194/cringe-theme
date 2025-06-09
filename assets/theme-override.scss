@@ -170,42 +170,6 @@ html.theme-auto code {
   }
 }
 
-/* Mermaid overrides for auto theme (system preference) */
-html.theme-auto {
-  @media (prefers-color-scheme: dark) {
-    .mermaid .icon,
-    .mermaid .node-icon,
-    .mermaid [class*='icon'],
-    .mermaid [class*='Icon'],
-    .mermaid [class*='node-icon'],
-    .mermaid .edgePath,
-    .mermaid .edgeLabel,
-    .mermaid .arrowhead,
-    .mermaid path,
-    .mermaid line,
-    .mermaid marker {
-      fill: #cdd6f4 !important;
-      stroke: #cdd6f4 !important;
-    }
-  }
-  @media (prefers-color-scheme: light) {
-    .mermaid .icon,
-    .mermaid .node-icon,
-    .mermaid [class*='icon'],
-    .mermaid [class*='Icon'],
-    .mermaid [class*='node-icon'],
-    .mermaid .edgePath,
-    .mermaid .edgeLabel,
-    .mermaid .arrowhead,
-    .mermaid path,
-    .mermaid line,
-    .mermaid marker {
-      fill: #313244 !important;
-      stroke: #313244 !important;
-    }
-  }
-}
-
 /* Mermaid icon and node symbol overrides for dark mode */
 html.theme-dark .mermaid .icon,
 html.theme-dark .mermaid .node-icon,
@@ -228,20 +192,70 @@ html.theme-light .mermaid [class*='node-icon'] {
 /* Mermaid arrow and edge overrides for dark mode */
 html.theme-dark .mermaid .edgePath,
 html.theme-dark .mermaid .edgeLabel,
-html.theme-dark .mermaid .arrowhead,
 html.theme-dark .mermaid path,
-html.theme-dark .mermaid line,
+html.theme-dark .mermaid line {
+  stroke: #cdd6f4 !important;
+}
+html.theme-dark .mermaid .arrowhead,
 html.theme-dark .mermaid marker {
   stroke: #cdd6f4 !important;
-  fill: #cdd6f4 !important;
+  fill: none !important;
 }
 
 html.theme-light .mermaid .edgePath,
 html.theme-light .mermaid .edgeLabel,
-html.theme-light .mermaid .arrowhead,
 html.theme-light .mermaid path,
-html.theme-light .mermaid line,
+html.theme-light .mermaid line {
+  stroke: #313244 !important;
+}
+html.theme-light .mermaid .arrowhead,
 html.theme-light .mermaid marker {
   stroke: #313244 !important;
-  fill: #313244 !important;
+  fill: none !important;
+}
+
+/* Mermaid overrides for auto theme (system preference) */
+html.theme-auto {
+  @media (prefers-color-scheme: dark) {
+    .mermaid .icon,
+    .mermaid .node-icon,
+    .mermaid [class*='icon'],
+    .mermaid [class*='Icon'],
+    .mermaid [class*='node-icon'] {
+      fill: #cdd6f4 !important;
+      stroke: #cdd6f4 !important;
+    }
+    .mermaid .edgePath,
+    .mermaid .edgeLabel,
+    .mermaid path,
+    .mermaid line {
+      stroke: #cdd6f4 !important;
+    }
+    .mermaid .arrowhead,
+    .mermaid marker {
+      stroke: #cdd6f4 !important;
+      fill: none !important;
+    }
+  }
+  @media (prefers-color-scheme: light) {
+    .mermaid .icon,
+    .mermaid .node-icon,
+    .mermaid [class*='icon'],
+    .mermaid [class*='Icon'],
+    .mermaid [class*='node-icon'] {
+      fill: #313244 !important;
+      stroke: #313244 !important;
+    }
+    .mermaid .edgePath,
+    .mermaid .edgeLabel,
+    .mermaid path,
+    .mermaid line {
+      stroke: #313244 !important;
+    }
+    .mermaid .arrowhead,
+    .mermaid marker {
+      stroke: #313244 !important;
+      fill: none !important;
+    }
+  }
 } 
